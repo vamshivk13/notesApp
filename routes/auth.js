@@ -44,7 +44,7 @@ router.post("/loginUser", async (req, res, next) => {
       email: req.body.email,
     });
 
-    if ((resp.password = req.body.password)) {
+    if (resp.password == req.body.password) {
       const sendData = {
         id: resp._id,
         email: resp.email,
