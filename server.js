@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 
 var bodyParser = require("body-parser");
+const Notes = require("./MongoDb/schemas/notes");
 require("dotenv").config();
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -26,4 +27,28 @@ function logger(req, res, next) {
 app.use("/auth", auth);
 app.use("/crud", crud);
 
-app.listen(process.env.PORT || 3001);
+const server = app.listen(process.env.PORT || 3001);
+const io = require("socket.io")(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: "*",
+    // credentials: true,
+  },
+});
+
+async function saveNote(noteData) {
+  const newNote = new Notes(noteData);
+  const res = await newNote.save();
+  console.log("resultSave", res);
+}
+
+io.on("connection", (socket) => {
+  console.log("User Connected");
+  socket.on("sendNote", (noteData) => {
+    saveNote(noteData);
+    console.log("noteData", noteData);
+  });
+  socket.on("disconnect", (msg) => {
+    console.log("user disonnected", msg);
+  });
+});

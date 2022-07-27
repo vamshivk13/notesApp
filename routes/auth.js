@@ -17,17 +17,17 @@ router.post("/registerUser", async (req, res, next) => {
 });
 
 function authorize(req, res, next) {
-  console.log("headers", req.headers);
-  console.log("Header1", req.headers["authorization"]);
+  // console.log("headers", req.headers);
+  // console.log("Header1", req.headers["authorization"]);
   const token = req.headers["authorization"];
   const headerauth = token?.split(" ")[1];
-  console.log("HEader", headerauth);
+  // console.log("HEader", headerauth);
 
   jwt.verify(headerauth, SECRET, (err, user) => {
     if (err) {
       res.send("error");
     }
-    console.log("auth User Data", user);
+    // console.log("auth User Data", user);
     req.user = user;
   });
   next();
