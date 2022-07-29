@@ -26,7 +26,7 @@ function logger(req, res, next) {
 }
 app.use("/auth", auth);
 app.use("/crud", crud);
-
+//process.env.PORT ||
 const server = app.listen(process.env.PORT || 3001);
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
@@ -36,17 +36,38 @@ const io = require("socket.io")(server, {
   },
 });
 
-async function saveNote(noteData) {
+async function createNote(noteData) {
   const newNote = new Notes(noteData);
   const res = await newNote.save();
-  console.log("resultSave", res);
+  return res;
 }
-
+async function updateNote(noteData) {
+  const result = await Notes.updateOne(
+    { _id: noteData.id },
+    { $set: { note: noteData.note, noteTitle: noteData.noteTitle } }
+  );
+}
+async function deleteNote(noteData) {
+  const result = await Notes.deleteOne({ _id: noteData.id });
+}
 io.on("connection", (socket) => {
   console.log("User Connected");
-  socket.on("sendNote", (noteData) => {
-    saveNote(noteData);
-    console.log("noteData", noteData);
+  socket.on("createNote", async (noteData) => {
+    const res = await createNote(noteData);
+    console.log("noteData", res);
+    io.to(socket.id).emit("noteCreated", res);
+    return res;
+  });
+  socket.on("updateNote", async (noteData) => {
+    io.to(socket.id).emit("updateStart", { updated: false });
+    const res = await updateNote(noteData);
+    io.to(socket.id).emit("updateStart", { updated: true });
+  });
+  socket.on("deleteNote", async (noteData) => {
+    const res = await deleteNote(noteData);
+  });
+  socket.on("discardIfEmpty", async (noteData) => {
+    console.log("discard", noteData);
   });
   socket.on("disconnect", (msg) => {
     console.log("user disonnected", msg);
