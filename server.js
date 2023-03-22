@@ -26,6 +26,10 @@ function logger(req, res, next) {
 }
 app.use("/auth", auth);
 app.use("/crud", crud);
+app.use("/test", (req, res) => {
+  res.send("Hello");
+});
+
 //process.env.PORT ||
 const server = app.listen(process.env.PORT || 3001);
 const io = require("socket.io")(server, {
