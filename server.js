@@ -15,8 +15,14 @@ connectDB();
 
 app.use(logger);
 function logger(req, res, next) {
+  req.set({
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true",
+    "Access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-control-allow-headers": "Content-Type,Authorization,Credentials",
+  });
   res.set({
-    "Access-control-allow-origin": "*",
+    "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Credentials": "true",
     "Access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-control-allow-headers": "Content-Type,Authorization,Credentials",
